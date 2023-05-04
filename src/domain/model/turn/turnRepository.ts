@@ -9,6 +9,7 @@ import { Turn } from './turn'
 import { toDisc } from './disc'
 import { Point } from './point'
 import { Move } from './move'
+import { DomainError } from '../../error/domainError'
 
 const gameGateway = new GameGateway()
 const turnGateway = new TurnGateway()
@@ -22,13 +23,9 @@ export class TurnRepository {
     turnCount: number
   ): Promise<Turn> {
 
-    const gameRecord = await gameGateway.findLatest(conn)
-    if (!gameRecord) {
-      throw new Error('Latest game not found')
-    }
     const turnRecord = await turnGateway.findForGameIdAndTurnCount(conn, gameId, turnCount)
     if (!turnRecord) {
-      throw new Error('Supecified turn not found')
+      throw new DomainError('SpecifiedTurnNotFound', 'Supecified turn not found')
     }
 
     const squareRecords = await squareGateway.findForTurnId(conn, turnRecord.id)
