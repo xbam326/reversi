@@ -1,14 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 import 'express-async-errors'
-import mysql from 'mysql2/promise'
-import { connectMySQL } from './dataaccess/connection'
-import { GameGateway } from './dataaccess/gameGateway'
-import { TurnGateway } from './dataaccess/turnGateway'
-import { MoveGateway } from './dataaccess/moveGateway'
-import { SquareGateway } from './dataaccess/squareGateway'
 import { gameRouter } from './presentation/gameRouter'
-import { DARK, LIGHT } from './application/constants'
 import { turnRouter } from './presentation/turnRouter'
 
 
@@ -19,11 +12,6 @@ const app = express()
 app.use(morgan('dev'))
 app.use(express.static('static', { extensions: ['html'] }))
 app.use(express.json())
-
-const gameGateway = new GameGateway()
-const turnGateway = new TurnGateway()
-const moveGateway = new MoveGateway()
-const squareGateway = new SquareGateway()
 
 app.use(gameRouter)
 app.use(turnRouter)

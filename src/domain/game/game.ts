@@ -1,6 +1,6 @@
-export class GameRecord {
+export class Game {
   constructor(
-    private _id: number,
+    private _id: number | undefined,
     private _startedAt: Date
   ) { }
 
