@@ -1,8 +1,8 @@
 import mysql from 'mysql2/promise'
 
-import { connectMySQL } from '../../infrastructure/connection'
+import { connectMySQL } from '../../../infrastructure/connection'
 import { Game } from './game'
-import { GameGateway } from '../../infrastructure/gameGateway'
+import { GameGateway } from '../../../infrastructure/gameGateway'
 
 
 

@@ -79,7 +79,7 @@ export class Board {
     // 左
     checkFlipPoints(-1, 0)
     // 左下
-    checkFlipPoints(-1, -1)
+    checkFlipPoints(-1, 1)
     // 下
     checkFlipPoints(0, 1)
     // 右下
@@ -87,7 +87,7 @@ export class Board {
     // 右
     checkFlipPoints(1, 0)
     // 右上
-    checkFlipPoints(1, 1)
+    checkFlipPoints(1, -1)
 
     return flipPoints
   }
