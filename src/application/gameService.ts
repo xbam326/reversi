@@ -1,5 +1,5 @@
-import { connectMySQL } from '../dataaccess/connection'
-import { GameGateway } from '../dataaccess/gameGateway'
+import { connectMySQL } from '../infrastructure/connection'
+import { GameGateway } from '../infrastructure/gameGateway'
 import { Game } from '../domain/game/game'
 import { GameRepository } from '../domain/game/gameRepository'
 import { firstTurn } from '../domain/turn/turn'
