@@ -1,15 +1,15 @@
 import { connectMySQL } from '../../infrastructure/connection'
-import { GameGateway } from '../../infrastructure/gameGateway'
 import { GameRepository } from '../../domain/model/game/gameRepository'
-import { Disc, toDisc } from '../../domain/model/turn/disc'
+import { Disc } from '../../domain/model/turn/disc'
 import { Point } from '../../domain/model/turn/point'
 import { TurnRepository } from '../../domain/model/turn/turnRepository'
 import { ApplicationError } from '../error/applicationError'
+import { GameResultRepository } from '../../domain/model/gameResult/gameResultRepository'
+import { GameResult } from '../../domain/model/gameResult/gameResult'
 
-
-const gameGateway = new GameGateway()
 const turnRepository = new TurnRepository()
 const gameRepository = new GameRepository()
+const gameResultRepository = new GameResultRepository()
 
 class FindLatestGameTurnByTurnCountOutput {
   constructor(
@@ -46,7 +46,13 @@ export class TurnService {
         throw new Error('game.id is not exist')
       }
       const turn = await turnRepository.findForGameIdAndTurnCount(conn, game.id, turnCount)
-      return new FindLatestGameTurnByTurnCountOutput(turnCount, turn.board.discs, turn.nextDisc, undefined)
+
+      let gameResult: GameResult | undefined
+      if (turn.gameEnded()) {
+        gameResult = await gameResultRepository.findForGameId(conn, game.id)
+
+      }
+      return new FindLatestGameTurnByTurnCountOutput(turnCount, turn.board.discs, turn.nextDisc, gameResult?.winnerDisc)
     } finally {
       await conn.end()
     }
@@ -80,6 +86,8 @@ export class TurnService {
       // 勝敗が決まった場合、対戦結果を保存する
       if (newTurn.gameEnded()) {
         const winnerDisc = newTurn.winnerDisc()
+        const gameResult = new GameResult(game.id, winnerDisc, newTurn.endAt)
+        await gameResultRepository.save(conn, gameResult)
       }
 
       await conn.commit()
