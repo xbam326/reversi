@@ -93,6 +93,35 @@ export class Board {
     return flipPoints
   }
 
+  existValidMove(disc: Disc): boolean {
+    for (let y = 0; y < this._discs.length; y++) {
+      const line = this._discs[y]
+
+      for (let x = 0; x < this._discs.length; x++) {
+        const discOnBoard = line[x]
+
+        // 空ではない点は無視
+        if (discOnBoard != Disc.Empty) continue
+
+        const move = new Move(disc, new Point(x, y))
+        const flipPoints = this.listFlipPoints(move)
+
+        // ひっくり返せる点がある場合、その石が置ける
+        if (flipPoints.length !== 0) {
+          return true
+        }
+      }
+      // 最後までひっくり返せるポイントが見つからなかった場合false
+    }
+    return false
+  }
+
+  count(disc: Disc): number {
+    return this._discs.map((line) => {
+      return line.filter((discOnBoard) => discOnBoard === disc).length
+    }).reduce((v1, v2) => v1 + v2, 0)
+  }
+
   private wallDiscs(): Disc[][] {
     const walled: Disc[][] = []
 

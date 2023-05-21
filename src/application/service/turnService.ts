@@ -1,9 +1,10 @@
-import { connectMySQL } from '../infrastructure/connection'
-import { GameGateway } from '../infrastructure/gameGateway'
-import { GameRepository } from '../domain/model/game/gameRepository'
-import { toDisc } from '../domain/model/turn/disc'
-import { Point } from '../domain/model/turn/point'
-import { TurnRepository } from '../domain/model/turn/turnRepository'
+import { connectMySQL } from '../../infrastructure/connection'
+import { GameGateway } from '../../infrastructure/gameGateway'
+import { GameRepository } from '../../domain/model/game/gameRepository'
+import { Disc, toDisc } from '../../domain/model/turn/disc'
+import { Point } from '../../domain/model/turn/point'
+import { TurnRepository } from '../../domain/model/turn/turnRepository'
+import { ApplicationError } from '../error/applicationError'
 
 
 const gameGateway = new GameGateway()
@@ -39,7 +40,7 @@ export class TurnService {
     try {
       const game = await gameRepository.findLatest(conn)
       if (!game) {
-        throw new Error('Latest game is not found')
+        throw new ApplicationError('LatestGameNotFound', 'Latest game is not found')
       }
       if (!game.id) {
         throw new Error('game.id is not exist')
@@ -51,14 +52,14 @@ export class TurnService {
     }
   }
 
-  async registerTurn(turnCount: number, disc: number, x: number, y: number) {
+  async registerTurn(turnCount: number, disc: Disc, point: Point) {
     const conn = await connectMySQL()
 
     try {
       // 1つ前のターンを取得する
       const game = await gameRepository.findLatest(conn)
       if (!game) {
-        throw new Error('Latest game is not found')
+        throw new ApplicationError('LatestGameNotFound', 'Latest game is not found')
       }
       if (!game.id) {
         throw new Error('game.id is not exist')
@@ -71,10 +72,15 @@ export class TurnService {
         previousTurnCount
       )
       // 石を置く
-      const newTurn = previousTurn.placeNext(toDisc(disc), new Point(x, y))
+      const newTurn = previousTurn.placeNext(disc, point)
 
       // ターンを保存する
       await turnRepository.save(conn, newTurn)
+
+      // 勝敗が決まった場合、対戦結果を保存する
+      if (newTurn.gameEnded()) {
+        const winnerDisc = newTurn.winnerDisc()
+      }
 
       await conn.commit()
     } finally {
