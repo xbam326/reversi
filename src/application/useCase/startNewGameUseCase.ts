@@ -7,13 +7,13 @@ import { TurnRepository } from '../../domain/model/turn/turnRepository'
 
 const gameGateway = new GameGateway()
 
-export class GameService {
+export class StartNewGameUseCase {
   constructor(
     private _gameRepository: GameRepository,
     private _turnRepository: TurnRepository
   ) { }
 
-  async startNewGame() {
+  async run() {
     const now = new Date()
     const conn = await connectMySQL()
 

@@ -1,5 +1,5 @@
 import express from 'express'
-import { GameService } from '../application/service/gameService'
+import { StartNewGameUseCase } from '../application/useCase/startNewGameUseCase'
 import { GameMySQLRepository } from '../infrastructure/repository/game/gameMySQLRepository'
 import { TurnMySQLRepository } from '../infrastructure/repository/turn/turnMySQLRepository'
 
@@ -8,11 +8,11 @@ export const gameRouter = express.Router()
 
 gameRouter.post('/api/games', async (req, res) => {
 
-  const gameService = new GameService(
+  const startNewGameUseCase = new StartNewGameUseCase(
     new GameMySQLRepository(),
     new TurnMySQLRepository()
   )
-  await gameService.startNewGame()
+  await startNewGameUseCase.run()
 
   res.status(201).end()
 })
